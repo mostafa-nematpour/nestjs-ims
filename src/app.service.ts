@@ -6,7 +6,7 @@ export class AppService {
   constructor(private configService: ConfigService) {}
 
   getHello(): string {
-    const db_user = this.configService.get<string>('DATABASE_USER');
-    return db_user;
+    const db_host = this.configService.get<string>('DB_HOST');
+    return db_host ?? 'not found';
   }
 }
