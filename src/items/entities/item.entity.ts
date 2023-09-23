@@ -1,5 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+} from 'typeorm';
 import { Category } from '../categories/entities/category.entity';
+import { Price } from '../prices/entities/price.entity';
 
 @Entity()
 export class Item {
@@ -36,4 +44,7 @@ export class Item {
   @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[];
+
+  @OneToMany(() => Price, (price) => price.item)
+  prices: Price[];
 }
