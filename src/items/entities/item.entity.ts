@@ -5,6 +5,8 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  UpdateDateColumn,
+  CreateDateColumn,
 } from 'typeorm';
 import { Category } from '../categories/entities/category.entity';
 import { Price } from '../prices/entities/price.entity';
@@ -40,6 +42,12 @@ export class Item {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   @ManyToMany(() => Category)
   @JoinTable()
