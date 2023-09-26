@@ -7,13 +7,13 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { ItemService } from './items.service';
+import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 
-@Controller('item')
-export class ItemController {
-  constructor(private readonly itemService: ItemService) {}
+@Controller('items')
+export class ItemsController {
+  constructor(private readonly itemService: ItemsService) {}
 
   @Post()
   create(@Body() createItemDto: CreateItemDto) {
