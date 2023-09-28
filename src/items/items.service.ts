@@ -12,8 +12,9 @@ export class ItemsService {
     private itemRepository: Repository<Item>,
   ) {}
 
-  create(createItemDto: CreateItemDto) {
-    return 'This action adds a new item';
+  async create(createItemDto: CreateItemDto) {
+    createItemDto.number = 10;
+    return createItemDto;
   }
 
   update(id: number, updateItemDto: UpdateItemDto) {

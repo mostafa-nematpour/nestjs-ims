@@ -19,19 +19,19 @@ export class Item {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   brand: string;
 
   @Column()
   status: string;
 
   @Column()
-  number: string;
+  number: number;
 
-  @Column()
+  @Column({ nullable: true })
   image: string;
 
   @Column()
