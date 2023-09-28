@@ -35,10 +35,10 @@ export class Item {
   image: string;
 
   @Column()
-  costPrice: number;
+  cost_price: number;
 
   @Column()
-  salePrice: number;
+  sale_price: number;
 
   @Column({ default: true })
   isActive: boolean;
