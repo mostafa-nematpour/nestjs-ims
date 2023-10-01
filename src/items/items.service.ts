@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { Item } from './entities/item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Price } from './prices/entities/price.entity';
@@ -59,13 +59,21 @@ export class ItemsService {
       // Not found
       throw new HttpException('id not found', HttpStatus.BAD_REQUEST);
     }
-
+    //  categories update
     if (updateItemDto.categories_id) {
       const categories = await this.categoryRepository.findBy({
         id: In(updateItemDto.categories_id),
       });
       item.categories = categories;
       await this.itemRepository.save(item);
+    }
+    // prices update
+    if (updateItemDto.sale_price !== undefined) {
+      const price: Price = new Price();
+      price.item_name = item.name;
+      price.item_price = updateItemDto.sale_price;
+      price.item = item;
+      await this.priceRepository.save(price);
     }
 
     delete updateItemDto.categories_id;
@@ -117,5 +125,19 @@ export class ItemsService {
     await this.itemRepository.delete(id);
 
     return { statusCode: 200, message: 'successfully deleted' };
+  }
+
+  async search(keyword: string) {
+    if (!keyword) {
+      throw new HttpException('keyword not be empty', HttpStatus.BAD_REQUEST);
+    }
+    return await this.itemRepository.find({
+      relations: {
+        categories: true,
+      },
+      where: {
+        name: Like(`%${keyword}%`),
+      },
+    });
   }
 }
