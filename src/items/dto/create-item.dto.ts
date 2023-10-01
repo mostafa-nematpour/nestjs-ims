@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsArray,
 } from 'class-validator';
 
 export class CreateItemDto {
@@ -53,4 +54,8 @@ export class CreateItemDto {
   @IsNotEmpty()
   @IsBoolean()
   is_active: boolean;
+
+  @IsOptional()
+  @IsArray()
+  categories_id: number[];
 }

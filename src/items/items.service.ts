@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Item } from './entities/item.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Price } from './prices/entities/price.entity';
+import { Category } from './categories/entities/category.entity';
 
 @Injectable()
 export class ItemsService {
@@ -13,17 +14,37 @@ export class ItemsService {
     private itemRepository: Repository<Item>,
     @InjectRepository(Price)
     private priceRepository: Repository<Price>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
   ) {}
 
   async create(createItemDto: CreateItemDto): Promise<Item> {
     const item: Item = await this.itemRepository.save(createItemDto);
 
+    if (createItemDto.categories_id) {
+      const categories = await this.categoryRepository.findBy({
+        id: In(createItemDto.categories_id),
+      });
+
+      item.categories = categories;
+    }
     const price: Price = new Price();
     price.item_name = item.name;
     price.item_price = item.sale_price;
     price.item = item;
     await this.priceRepository.save(price);
-    return item;
+
+    await this.itemRepository.save(item);
+
+    const result = await this.itemRepository.findOne({
+      relations: {
+        categories: true,
+        prices: true,
+      },
+      where: { id: item.id },
+    });
+    
+    return result;
   }
 
   async update(updateItemDto: UpdateItemDto) {
