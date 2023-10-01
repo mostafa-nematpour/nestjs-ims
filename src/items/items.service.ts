@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { In, Repository } from 'typeorm';
@@ -43,32 +43,79 @@ export class ItemsService {
       },
       where: { id: item.id },
     });
-    
+
     return result;
   }
 
-  async update(updateItemDto: UpdateItemDto) {
-    const item: Item = new Item();
-    item.id = updateItemDto.id;
+  async update(id: number, updateItemDto: UpdateItemDto) {
+    const item = await this.itemRepository.findOne({
+      where: { id: id },
+      relations: {
+        categories: true,
+      },
+    });
 
-    // const item0: Item = /await this.itemRepository.findOne(item);
-    return 'll';
+    if (!item) {
+      // Not found
+      throw new HttpException('id not found', HttpStatus.BAD_REQUEST);
+    }
+
+    if (updateItemDto.categories_id) {
+      const categories = await this.categoryRepository.findBy({
+        id: In(updateItemDto.categories_id),
+      });
+      item.categories = categories;
+      await this.itemRepository.save(item);
+    }
+
+    delete updateItemDto.categories_id;
+    await this.itemRepository.update(id, updateItemDto);
+
+    const result = await this.itemRepository.findOne({
+      relations: {
+        categories: true,
+        prices: true,
+      },
+      where: { id: item.id },
+    });
+
+    return result;
   }
 
   findAll(): Promise<Item[]> {
-    // return this.itemRepository.find({
-    //   relations: {
-    //     prices: true,
-    //   },
-    // });
-    return this.itemRepository.find();
+    return this.itemRepository.find({
+      relations: {
+        categories: true,
+      },
+    });
   }
 
-  findOne(id: number): Promise<Item | null> {
-    return this.itemRepository.findOneBy({ id });
+  async findOne(id: number): Promise<Item | null> {
+    const item = await this.itemRepository.findOne({
+      relations: {
+        categories: true,
+        prices: true,
+      },
+      where: { id: id },
+    });
+    if (!item) {
+      throw new HttpException('item not found', HttpStatus.BAD_REQUEST);
+    }
+    return item;
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: number) {
+    const item = await this.itemRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!item) {
+      // Not found
+      throw new HttpException('item not found', HttpStatus.BAD_REQUEST);
+    }
+
     await this.itemRepository.delete(id);
+
+    return { statusCode: 200, message: 'successfully deleted' };
   }
 }
