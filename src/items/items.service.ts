@@ -26,9 +26,12 @@ export class ItemsService {
     return item;
   }
 
-  update(id: number, updateItemDto: UpdateItemDto) {
-    
-    return `This action updates a #${id} item`;
+  async update(updateItemDto: UpdateItemDto) {
+    const item: Item = new Item();
+    item.id = updateItemDto.id;
+
+    // const item0: Item = /await this.itemRepository.findOne(item);
+    return 'll';
   }
 
   findAll(): Promise<Item[]> {
