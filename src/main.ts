@@ -9,9 +9,9 @@ async function bootstrap() {
       whitelist: true,
       disableErrorMessages: false,
       transform: true,
+      skipMissingProperties: false,
     }),
   );
-
   await app.listen(3000);
 }
 bootstrap();
