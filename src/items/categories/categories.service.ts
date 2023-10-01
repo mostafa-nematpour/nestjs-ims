@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
@@ -11,12 +11,33 @@ export class CategoriesService {
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
   ) {}
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+
+  async create(createCategoryDto: CreateCategoryDto) {
+    if (createCategoryDto.parent_id) {
+      const parent = await this.categoryRepository.findOne({
+        where: { id: createCategoryDto.parent_id },
+      });
+      if (!parent) {
+        throw new HttpException('parent not found', HttpStatus.BAD_REQUEST);
+      }
+    }
+    const category = await this.categoryRepository.save(createCategoryDto);
+
+    return category;
   }
 
-  findAll() {
-    return this.categoryRepository.find();
+  async findAll() {
+    const categories = await this.categoryRepository.find();
+    const nestedCategories = categories.map((category) => {
+      return {
+        ...category,
+        children: categories.filter((c) => c.parent_id === category.id),
+      };
+    });
+    // remove children from main list
+    const topLevelCategories = nestedCategories.filter((c) => !c.parent_id);
+
+    return topLevelCategories;
   }
 
   findOne(id: number) {
