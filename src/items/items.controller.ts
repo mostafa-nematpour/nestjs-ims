@@ -30,9 +30,9 @@ export class ItemsController {
     return this.itemService.findOne(+id);
   }
 
-  @Patch('update')
-  update(@Body() updateItemDto: UpdateItemDto) {
-    return this.itemService.update(updateItemDto);
+  @Patch('update/:id')
+  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
+    return this.itemService.update(+id, updateItemDto);
   }
 
   @Delete(':id')

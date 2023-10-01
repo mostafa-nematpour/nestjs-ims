@@ -6,16 +6,11 @@ import {
   Min,
   Max,
   IsBoolean,
-  IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
 
 export class UpdateItemDto extends PartialType(CreateItemDto) {
-  @IsNotEmpty()
-  @IsInt()
-  id: number;
-
   @IsOptional()
   @IsString()
   @Length(4, 50)
