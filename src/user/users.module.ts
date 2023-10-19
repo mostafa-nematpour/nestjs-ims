@@ -9,4 +9,4 @@ import { RefreshToken } from './entities/refresh-token.entity';
   providers: [UsersService],
   exports: [UsersService, TypeOrmModule],
 })
-export class UserModule {}
+export class UsersModule {}
