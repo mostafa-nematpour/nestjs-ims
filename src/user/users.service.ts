@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { RefreshToken } from './entities/refresh-token.entity';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
